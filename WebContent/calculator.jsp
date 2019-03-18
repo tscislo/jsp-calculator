@@ -22,7 +22,7 @@
 			<div id="display">
 				<div id="result">
 					<p><%=calculatorBean.getCurrentOnDisplay()%></p>
-					<p>${calculatorBean.getPreviousOperation().getOperation()} ${calculatorBean.getCurrentOperation().getOperation()}</p>
+					<!-- <p>${calculatorBean.getPreviousOperation().getOperation()} ${calculatorBean.getCurrentOperation().getOperation()}</p> -->
 				</div>
 			</div>
 			<div id="keyboard">

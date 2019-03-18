@@ -35,18 +35,16 @@ public class CalculatorServlet extends HttpServlet {
 
 		CalculatorBean calculatorBean = (CalculatorBean) session.getAttribute("calculatorBean");
 
-		String operation = request.getParameter("operation");
+		String operationName = request.getParameter("operation");
 
 		if (calculatorBean == null) {
 			calculatorBean = new CalculatorBean();
 			session.setAttribute("calculatorBean", calculatorBean);
 		} else {
-
-			if (operation != null) {
-				Operation ope = new Operation(operation);
-				calculatorBean.addNewOperation(ope);
+			if (operationName != null) {
+				Operation operation = new Operation(operationName);
+				calculatorBean.addNewOperation(operation);
 			}
-
 		}
 
 		String dest = "/calculator.jsp";

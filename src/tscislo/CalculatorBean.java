@@ -8,7 +8,7 @@ public class CalculatorBean {
 	private Operation currentOperation;
 	private Operation previousOperation;
 	private Operation previousArthmeticOperation;
-	
+
 	private CalculatorStates state = CalculatorStates.IDLE;
 
 	private void init() {
@@ -25,78 +25,86 @@ public class CalculatorBean {
 	}
 
 	public void addNewOperation(Operation operation) {
-		if(this.state == CalculatorStates.ERROR) {
+		if (this.state == CalculatorStates.ERROR) {
 			this.init();
 		}
-		
-		if (operation.isEq() && this.previousArthmeticOperation != null
-				&& !this.previousArthmeticOperation.getWasExecuted()
-				) {
-			this.performArthemticOperation(this.previousArthmeticOperation);
-			this.currentOperation = new Operation("=");
-		}
 
-		this.previousOperation = this.currentOperation.clone();
-		this.currentOperation = operation;
-		
-		if(operation.isArthmetic()) {
-			this.previousArthmeticOperation = operation;
-		}
-
-		if (this.currentOperation.isNumber()) {
-			if (this.previousOperation.isArthmetic() || this.previousOperation.isEq()) {
-				this.currentOnDisplay = "";
-			}
-			if (this.currentOnDisplay.equals("0")) {
-				this.currentOnDisplay = operation.getOperation();
-			} else {
-				this.currentOnDisplay += operation.getOperation();
+		try {
+			if (operation.isEq() && this.previousArthmeticOperation != null
+					&& !this.previousArthmeticOperation.getWasExecuted()) {
+				this.performArthemticOperation(this.previousArthmeticOperation);
+				this.currentOperation = new Operation("=");
 			}
 
-		} else if (!this.previousOperation.isEq() 
-				&& operation.isArthmetic()
-				) {
-			if (currentInMemory.equals("0")) {
-				this.currentInMemory = this.currentOnDisplay;
-			} else {
-				this.performArthemticOperation(this.currentOperation);
-			}
-		} else if (operation.isClear()) {
-			this.init();
-		}
-		this.state = CalculatorStates.NORMAL;
+			this.previousOperation = this.currentOperation.clone();
+			this.currentOperation = operation;
 
+			if (operation.isArthmetic()) {
+				this.previousArthmeticOperation = operation;
+			}
+			if (this.currentOperation.isNumber()) {
+				if (this.previousOperation.isArthmetic() || this.previousOperation.isEq()) {
+					this.currentOnDisplay = "";
+				}
+				if (this.currentOnDisplay.equals("0")) {
+					this.currentOnDisplay = operation.getOperation();
+				} else {
+					this.currentOnDisplay += operation.getOperation();
+					if (this.currentOnDisplay.length() > 12) {
+						throw new Exception();
+					}
+				}
+
+			} else if (!this.previousOperation.isEq() && operation.isArthmetic()) {
+				if (currentInMemory.equals("0")) {
+					this.currentInMemory = this.currentOnDisplay;
+				} else {
+					this.performArthemticOperation(this.currentOperation);
+				}
+			} else if (operation.isClear()) {
+				this.init();
+			}
+			this.state = CalculatorStates.NORMAL;
+		} catch (Exception e) {
+			this.handleError();
+		}
 	}
 
 	public void performArthemticOperation(Operation operation) {
-		try {
-			switch (operation.getOperation()) {
-			case "+":
-				this.currentOnDisplay = Double
-						.toString((Double.valueOf(currentInMemory) + Double.valueOf(currentOnDisplay)));
-				break;
-			case "-":
-				this.currentOnDisplay = Double
-						.toString((Double.valueOf(currentInMemory) - Double.valueOf(currentOnDisplay)));
-				break;
-			case "*":
-				this.currentOnDisplay = Double
-						.toString((Double.valueOf(currentInMemory) * Double.valueOf(currentOnDisplay)));
-				break;
-			case "/":
-				this.currentOnDisplay = Double
-						.toString((Double.valueOf(currentInMemory) / Double.valueOf(currentOnDisplay)));
-				break;
-			default:
-				break;
-			}
-			operation.setWasExecuted(true);
-		} catch (Exception e) {
-			this.currentOnDisplay = "Error!";
-			this.state = CalculatorStates.ERROR;
+		switch (operation.getOperation()) {
+		case "+":
+			this.currentOnDisplay = Double
+					.toString((Double.valueOf(currentInMemory) + Double.valueOf(currentOnDisplay)));
+			break;
+		case "-":
+			this.currentOnDisplay = Double
+					.toString((Double.valueOf(currentInMemory) - Double.valueOf(currentOnDisplay)));
+			break;
+		case "*":
+			this.currentOnDisplay = Double
+					.toString((Double.valueOf(currentInMemory) * Double.valueOf(currentOnDisplay)));
+			break;
+		case "/":
+			this.currentOnDisplay = Double
+					.toString((Double.valueOf(currentInMemory) / Double.valueOf(currentOnDisplay)));
+			break;
+		case "sqrt":
+			this.currentOnDisplay = Double.toString(Math.sqrt(Double.valueOf(currentOnDisplay)));
+			break;
+		case "%":
+			this.currentOnDisplay = Double
+					.toString((Double.valueOf(currentOnDisplay) * Double.valueOf(currentInMemory) / 100));
+			break;
+		default:
+			break;
 		}
-
+		operation.setWasExecuted(true);
 		this.currentInMemory = this.currentOnDisplay;
+	}
+
+	private void handleError() {
+		this.currentOnDisplay = "ERR";
+		this.state = CalculatorStates.ERROR;
 	}
 
 	public String getCurrentOnDisplay() {
