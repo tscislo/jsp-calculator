@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
 /**
  * Servlet implementation class CalculatorServlet
  */
@@ -37,13 +36,17 @@ public class CalculatorServlet extends HttpServlet {
 		CalculatorBean calculatorBean = (CalculatorBean) session.getAttribute("calculatorBean");
 
 		String operation = request.getParameter("operation");
-		
+
 		if (calculatorBean == null) {
 			calculatorBean = new CalculatorBean();
 			session.setAttribute("calculatorBean", calculatorBean);
 		} else {
-			calculatorBean.setCurrentValue(calculatorBean.getCurrentValue() + 1);
-			calculatorBean.setOperation(operation);
+
+			if (operation != null) {
+				Operation ope = new Operation(operation);
+				calculatorBean.addNewOperation(ope);
+			}
+
 		}
 
 		String dest = "/calculator.jsp";

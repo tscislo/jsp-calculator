@@ -17,12 +17,12 @@
 
 <body>
 
-	<form class="container">
+	<form class="container" method="post">
 		<div id="calc" class="text-center">
 			<div id="display">
 				<div id="result">
-					<p><%=calculatorBean.getCurrentValue()%></p>
-					<p><%=calculatorBean.getOperation()%></p>
+					<p><%=calculatorBean.getCurrentOnDisplay()%></p>
+					<p>${calculatorBean.getPreviousOperation().getOperation()} ${calculatorBean.getCurrentOperation().getOperation()}</p>
 				</div>
 			</div>
 			<div id="keyboard">
