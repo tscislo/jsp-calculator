@@ -43,7 +43,7 @@ public class CalculatorServlet extends HttpServlet {
 		} else {
 			if (operationName != null) {
 				Operation operation = new Operation(operationName);
-				calculatorBean.addNewOperation(operation);
+				calculatorBean.processOperation(operation);
 			}
 		}
 
