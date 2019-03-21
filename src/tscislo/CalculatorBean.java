@@ -11,6 +11,8 @@ public class CalculatorBean {
 
 	private CalculatorStates state = CalculatorStates.IDLE;
 
+	private int numberOfDigitsOnDisplayLimit = 20;
+
 	private void init() {
 		this.state = CalculatorStates.IDLE;
 		this.currentInMemory = "0";
@@ -32,7 +34,7 @@ public class CalculatorBean {
 		try {
 			if (operation.isEq() && this.previousArthmeticOperation != null
 					&& !this.previousArthmeticOperation.getWasExecuted()) {
-				this.performArthemticOperation(this.previousArthmeticOperation);
+				this.performArthemticOperation(this.previousArthmeticOperation, true);
 				this.currentOperation = new Operation("=");
 			}
 
@@ -50,27 +52,26 @@ public class CalculatorBean {
 					this.currentOnDisplay = operation.getOperation();
 				} else {
 					this.currentOnDisplay += operation.getOperation();
-					if (this.currentOnDisplay.length() > 12) {
-						throw new Exception();
-					}
 				}
 
 			} else if (!this.previousOperation.isEq() && operation.isArthmetic()) {
 				if (currentInMemory.equals("0")) {
 					this.currentInMemory = this.currentOnDisplay;
 				} else {
-					this.performArthemticOperation(this.currentOperation);
+					this.performArthemticOperation(this.currentOperation,
+							(this.state == CalculatorStates.IDLE) ? false : true);
 				}
 			} else if (operation.isClear()) {
 				this.init();
 			}
 			this.state = CalculatorStates.NORMAL;
+			this.verifyValue();
 		} catch (Exception e) {
-			this.handleError();
+			this.reportError();
 		}
 	}
 
-	public void performArthemticOperation(Operation operation) {
+	public void performArthemticOperation(Operation operation, Boolean markAsExecuted) {
 		switch (operation.getOperation()) {
 		case "+":
 			this.currentOnDisplay = Double
@@ -98,11 +99,17 @@ public class CalculatorBean {
 		default:
 			break;
 		}
-		operation.setWasExecuted(true);
+		operation.setWasExecuted(markAsExecuted);
 		this.currentInMemory = this.currentOnDisplay;
 	}
 
-	private void handleError() {
+	private void verifyValue() throws Exception {
+		if (this.currentOnDisplay.length() > numberOfDigitsOnDisplayLimit || this.currentOnDisplay == "Infinity") {
+			throw new Exception();
+		}
+	}
+
+	private void reportError() {
 		this.currentOnDisplay = "ERR";
 		this.state = CalculatorStates.ERROR;
 	}
